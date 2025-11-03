@@ -16,7 +16,7 @@
           "type": "text",
           "name": "t:names.heading",
           "settings": {
-            "text": "<p>Hungry?</p>",
+            "text": "<p>Gutom? </p>",
             "width": "fit-content",
             "max_width": "normal",
             "alignment": "center",
@@ -32,7 +32,7 @@
             "background_color": "#00000026",
             "corner_radius": 0,
             "padding-block-start": 0,
-            "padding-block-end": 60,
+            "padding-block-end": 85,
             "padding-inline-start": 0,
             "padding-inline-end": 0
           },
