@@ -70,15 +70,6 @@
     "footer_utilities_jLGE8U": {
       "type": "footer-utilities",
       "blocks": {
-        "footer_copyright_jweRK8": {
-          "type": "footer-copyright",
-          "settings": {
-            "show_powered_by": false,
-            "font_size": "0.75rem",
-            "case": "none"
-          },
-          "blocks": {}
-        },
         "social_links_VHWhq3": {
           "type": "social-links",
           "settings": {
@@ -97,11 +88,20 @@
             "custom_url": ""
           },
           "blocks": {}
+        },
+        "footer_copyright_jweRK8": {
+          "type": "footer-copyright",
+          "settings": {
+            "show_powered_by": false,
+            "font_size": "0.75rem",
+            "case": "none"
+          },
+          "blocks": {}
         }
       },
       "block_order": [
-        "footer_copyright_jweRK8",
-        "social_links_VHWhq3"
+        "social_links_VHWhq3",
+        "footer_copyright_jweRK8"
       ],
       "name": "t:names.utilities",
       "settings": {
