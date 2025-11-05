@@ -28,10 +28,9 @@
         },
         "header-menu": {
           "type": "_header-menu",
-          "disabled": true,
           "static": true,
           "settings": {
-            "menu": "",
+            "menu": "menu",
             "color_scheme": "",
             "type_font_primary_size": "0.875rem",
             "menu_font_style": "inverse",
