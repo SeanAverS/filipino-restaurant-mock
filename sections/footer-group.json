@@ -52,7 +52,37 @@
             "padding-inline-start": 0,
             "padding-inline-end": 0
           },
-          "blocks": {}
+          "blocks": {
+            "text_Uceijj": {
+              "type": "text",
+              "name": "t:names.text",
+              "settings": {
+                "text": "<p>Hours:  Mon to Sat<strong> 10am to 8pm</strong> -  Sundays Closed</p><p>Phone: <strong>(778) 123-4567</strong></p><p>Address: <strong>8910 Sesame Ave, behind the mall</strong></p>",
+                "width": "100%",
+                "max_width": "normal",
+                "alignment": "center",
+                "type_preset": "h6",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "color": "var(--color-foreground)",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "text_Uceijj"
+          ]
         }
       },
       "block_order": [
