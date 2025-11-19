@@ -56,7 +56,7 @@
         "text_3mfTXt": {
           "type": "text",
           "settings": {
-            "text": "<p>\"Welcome to [Restaurant Name], a family-owned Filipino eatery where every dish is made with love and tradition. We bring the flavors of the Philippines to your table, sharing our family recipes and a taste of home in every bite.\"</p>",
+            "text": "<p>\"We are [Restaurant Name], a family owned Filipino eatery where every dish is made with love and tradition with service that makes you feel at home.\"</p>",
             "width": "100%",
             "max_width": "narrow",
             "alignment": "center",
