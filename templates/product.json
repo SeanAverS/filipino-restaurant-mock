@@ -107,6 +107,13 @@
                 "padding-inline-end": 0
               },
               "blocks": {
+                "updated_review_widget_star_rating_Y4Rgkz": {
+                  "type": "shopify://apps/updated-review-widget/blocks/star_rating/019ac813-34eb-73fb-ab0a-856a1582c92d",
+                  "settings": {
+                    "product": "{{closest.product}}",
+                    "colour": "#ff0000"
+                  }
+                },
                 "text_xrnftG": {
                   "type": "text",
                   "name": "Product title",
@@ -183,6 +190,7 @@
                 }
               },
               "block_order": [
+                "updated_review_widget_star_rating_Y4Rgkz",
                 "text_xrnftG",
                 "text_UdAdQL",
                 "price_tVjtKg"
