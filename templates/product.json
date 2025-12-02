@@ -185,7 +185,7 @@
                   "type": "shopify://apps/updated-review-widget/blocks/star_rating/019ad2c2-f6eb-75dd-b9b5-bdfae721356a",
                   "settings": {
                     "product": "{{closest.product}}",
-                    "colour": "#ff0000"
+                    "colour": "#0b0b0b"
                   }
                 }
               },
