@@ -137,7 +137,7 @@
                   "type": "text",
                   "name": "Product description",
                   "settings": {
-                    "text": "<p>{{ closest.product.description }}</p>",
+                    "text": "{{ closest.product.description }}",
                     "width": "100%",
                     "max_width": "normal",
                     "alignment": "left",
@@ -185,7 +185,7 @@
                   "type": "shopify://apps/updated-review-widget/blocks/star_rating/019ad2c2-f6eb-75dd-b9b5-bdfae721356a",
                   "settings": {
                     "product": "{{closest.product}}",
-                    "colour": "#0b0b0b"
+                    "colour": "#f7bc45"
                   }
                 }
               },
