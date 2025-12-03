@@ -1,0 +1,94 @@
+{% comment %} get current average rating (reviews.average_rating) {% endcomment %}
+{% assign avg_rating = product.metafields.reviews.average_rating.value %}
+{% assign rounded_rating = avg_rating | round %}
+
+<div id="star-rating-display-{{ product.id }}" class="star-rating-container">
+  
+  <div class="current-average-display">
+    {% if avg_rating %}
+      <span id="star-display-{{ product.id }}">
+        {% render 'stars', rating: rounded_rating %} 
+      </span>
+      <span id="vote-count-{{ product.id }}">
+        ({{ avg_rating }} / 
+      </span>
+    {% endif %}
+  </div>
+
+  {% comment %} display stars {% endcomment %}
+  <div
+    id="star-rating-input-{{ product.id }}"
+    class="star-rating-input"
+    data-product-id="{{ product.id }}"
+  >
+    <span class="input-label">Rate this product:</span>
+    {% for i in (1..5) %}
+      <span class="star-vote" data-rating="{{ i }}">★</span>
+    {% endfor %}
+  </div>
+
+  <p id="rating-message-{{ product.id }}"></p>
+</div>
+
+<script>
+  // star rating functionality 
+  document.addEventListener('DOMContentLoaded', () => {
+    const productId = {{ product.id }};
+    const container = document.getElementById(`star-rating-display-${productId}`);
+    const inputContainer = document.getElementById(`star-rating-input-${productId}`);
+    const messageElement = document.getElementById(`rating-message-${productId}`);
+    const stars = inputContainer.querySelectorAll('.star-vote');
+    const starDisplayElement = container.querySelector('#star-display-' + productId);
+    
+    if (!stars.length || !starDisplayElement) return;
+
+    // star rating click event listener 
+    stars.forEach(star => {
+      star.addEventListener('click', async (e) => {
+        const rating = e.target.dataset.rating;
+        messageElement.textContent = 'Submitting rating...';
+        
+        try {
+          const response = await fetch('https://reviews-widget-production.up.railway.app/submit-rating', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId: productId.toString(), rating: parseInt(rating) })
+          });
+
+          if (response.ok) {
+              const data = await response.json();
+              const newAverage = parseFloat(data.newAvgRating); 
+              inputContainer.style.display = 'none';
+              messageElement.textContent = 'Thanks for your rating!';
+              
+              // update star display 
+              if (starDisplayElement) {
+                const roundedRating = Math.round(newAverage);
+                let newStarHTML = '';
+                
+                for (let i = 0; i < roundedRating; i++) {
+                  newStarHTML += '★'; 
+                }
+                for (let i = roundedRating; i < 5; i++) {
+                  newStarHTML += '☆'; 
+                }
+                starDisplayElement.innerHTML = newStarHTML;
+                
+                const newAvgText = newAverage.toFixed(1);
+                const voteCountElement = container.querySelector('#vote-count-' + productId);
+                if (voteCountElement) {
+                   voteCountElement.textContent = `(${newAvgText} updated)`;
+                }
+              }
+
+          } else {
+            const errorDetails = await response.text();
+            messageElement.textContent = `Submission failed. Error: ${errorDetails.substring(0, 50)}...`;
+          }
+        } catch (error) {
+          messageElement.textContent = `Network error during submission: ${error.message}`;
+        }
+      });
+    });
+  });
+</script>
