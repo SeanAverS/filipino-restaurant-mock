@@ -24,6 +24,8 @@
         {{- product.title }}
       </a>
     </div>
+
+    {% render 'unified-star-rating', product: product %}
     {% content_for 'blocks' %}
   {% endcapture %}
 
