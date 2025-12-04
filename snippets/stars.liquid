@@ -1,8 +1,10 @@
 {% comment %} display stars {% endcomment %}
-{%- for i in (1..rating) -%}
+{% assign rounded_rating = rating | times: 1 | round %}
+
+{%- for i in (1..rounded_rating) -%}
   ★
 {%- endfor -%}
-{%- assign blank_stars = 5 | minus: rating -%}
+{%- assign blank_stars = 5 | minus: rounded_rating -%}
 {%- for i in (1..blank_stars) -%}
   ☆
 {%- endfor -%}

@@ -1,30 +1,40 @@
-{% comment %} get current average rating (reviews.average_rating) {% endcomment %}
-{% assign avg_rating = product.metafields.reviews.average_rating.value %}
-{% assign rounded_rating = avg_rating | round %}
+{% comment %} preprare and display current average rating {% endcomment %}
 
-<div id="star-rating-display-{{ product.id }}" class="star-rating-container">
-  
-  <div class="current-average-display">
-    {% if avg_rating %}
-      <span id="star-display-{{ product.id }}">
-        {% render 'stars', rating: rounded_rating %} 
-      </span>
-      <span id="vote-count-{{ product.id }}">
-        ({{ avg_rating }} / 
-      </span>
-    {% endif %}
-  </div>
+{% assign avg_rating_raw = product.metafields.reviews.average_rating.value %}
 
-  {% comment %} display stars {% endcomment %}
+{% comment %} convert string metafield value to number for reliable comparison {% endcomment %}
+{% assign avg_rating = avg_rating_raw | times: 1 %} 
+
+{% assign is_rated = false %}
+
+
+{% comment %} star rating widget {% endcomment %}
+<div id="star-rating-container-{{ product.id }}" class="star-rating-container">
   <div
-    id="star-rating-input-{{ product.id }}"
-    class="star-rating-input"
+    id="star-rating-widget-{{ product.id }}"
+    class="star-rating-widget"
     data-product-id="{{ product.id }}"
   >
-    <span class="input-label">Rate this product:</span>
-    {% for i in (1..5) %}
-      <span class="star-vote" data-rating="{{ i }}">★</span>
-    {% endfor %}
+    
+    {% if is_rated %}
+      <span id="star-display-{{ product.id }}">
+        {% render 'stars', rating: avg_rating %} 
+      </span>
+      <span id="vote-count-{{ product.id }}">
+        ({{ avg_rating | round: 1 }} / 5)
+      </span>
+      
+    {% else %}
+      <span class="input-label">Rating: </span>
+      <span id="star-display-{{ product.id }}">
+        {% for i in (1..5) %}
+          <span class="star-vote" data-rating="{{ i }}">★</span>
+        {% endfor %}
+      </span>
+      <span id="vote-count-{{ product.id }}">
+      </span>
+    {% endif %}
+
   </div>
 
   <p id="rating-message-{{ product.id }}"></p>
@@ -34,19 +44,32 @@
   // star rating functionality 
   document.addEventListener('DOMContentLoaded', () => {
     const productId = {{ product.id }};
-    const container = document.getElementById(`star-rating-display-${productId}`);
-    const inputContainer = document.getElementById(`star-rating-input-${productId}`);
+    const widgetElement = document.getElementById(`star-rating-widget-${productId}`);
     const messageElement = document.getElementById(`rating-message-${productId}`);
-    const stars = inputContainer.querySelectorAll('.star-vote');
-    const starDisplayElement = container.querySelector('#star-display-' + productId);
     
-    if (!stars.length || !starDisplayElement) return;
+    // rating functionality
+    const starDisplayElement = widgetElement.querySelector('#star-display-' + productId);
+    const stars = starDisplayElement ? starDisplayElement.querySelectorAll('.star-vote') : [];
+    
+    if (stars.length === 0) return;
 
-    // star rating click event listener 
+    // star hover effects 
     stars.forEach(star => {
+      star.addEventListener('mouseover', (e) => {
+          const ratingValue = parseInt(e.target.dataset.rating);
+          stars.forEach(s => {
+              s.style.color = parseInt(s.dataset.rating) <= ratingValue ? '#F7BC45' : '#ccc'; 
+          });
+      });
+      star.addEventListener('mouseout', () => {
+          stars.forEach(s => s.style.color = '#ccc'); 
+      });
+
+      // click listener for rating submission
       star.addEventListener('click', async (e) => {
         const rating = e.target.dataset.rating;
         messageElement.textContent = 'Submitting rating...';
+        starDisplayElement.style.pointerEvents = 'none'; 
         
         try {
           const response = await fetch('https://reviews-widget-production.up.railway.app/submit-rating', {
@@ -58,35 +81,32 @@
           if (response.ok) {
               const data = await response.json();
               const newAverage = parseFloat(data.newAvgRating); 
-              inputContainer.style.display = 'none';
               messageElement.textContent = 'Thanks for your rating!';
               
-              // update star display 
-              if (starDisplayElement) {
-                const roundedRating = Math.round(newAverage);
-                let newStarHTML = '';
-                
-                for (let i = 0; i < roundedRating; i++) {
-                  newStarHTML += '★'; 
-                }
-                for (let i = roundedRating; i < 5; i++) {
-                  newStarHTML += '☆'; 
-                }
-                starDisplayElement.innerHTML = newStarHTML;
-                
-                const newAvgText = newAverage.toFixed(1);
-                const voteCountElement = container.querySelector('#vote-count-' + productId);
-                if (voteCountElement) {
-                   voteCountElement.textContent = `(${newAvgText} updated)`;
-                }
+              // update star display
+              const roundedRating = Math.round(newAverage);
+              let newStarHTML = '';
+              
+              // Re-render stars based on new average
+              for (let i = 1; i <= 5; i++) {
+                  newStarHTML += `<span class="star-fill" style="color: ${i <= roundedRating ? '#F7BC45' : '#ccc'}; cursor: default;">★</span>`;
+              }
+              starDisplayElement.innerHTML = newStarHTML;
+              
+              // update average text ---
+              const voteCountElement = widgetElement.querySelector('#vote-count-' + productId);
+              if (voteCountElement) {
+                 voteCountElement.textContent = `(${newAverage.toFixed(1)} / 5)`;
               }
 
           } else {
             const errorDetails = await response.text();
             messageElement.textContent = `Submission failed. Error: ${errorDetails.substring(0, 50)}...`;
+            starDisplayElement.style.pointerEvents = 'auto'; // Re-enable clicks on failure
           }
         } catch (error) {
           messageElement.textContent = `Network error during submission: ${error.message}`;
+          starDisplayElement.style.pointerEvents = 'auto'; // Re-enable clicks on failure
         }
       });
     });
