@@ -1,19 +1,17 @@
-{% comment %} preprare and display current average rating {% endcomment %}
+{% comment %} prepare and display current average rating {% endcomment %}
 
 {% assign avg_rating_raw = product.metafields.reviews.average_rating.value %}
-
-{% comment %} convert string metafield value to number for reliable comparison {% endcomment %}
+{% comment %} Ensure avg_rating is a number {% endcomment %}
 {% assign avg_rating = avg_rating_raw | times: 1 %} 
 
 {% assign is_rated = false %}
 
-{% comment %} 
-  persist average rating 
-{% endcomment %}
-{% if avg_rating > 0 %}
+{% comment %} Check if custom.star_ratings metafield has content {% endcomment %}
+{% assign raw_ratings_json = product.metafields.custom.star_ratings.value %}
+
+{% if raw_ratings_json != blank and raw_ratings_json != "[]" %}
   {% assign is_rated = true %}
 {% endif %}
-
 
 {% comment %} star rating widget {% endcomment %}
 <div id="star-rating-container-{{ product.id }}" class="star-rating-container">
