@@ -19,26 +19,34 @@
     id="star-rating-widget-{{ product.id }}"
     class="star-rating-widget"
     data-product-id="{{ product.id }}"
+    data-initial-rating="{{ rounded_avg_rating }}"
   >
     
-    {% if is_rated %}
-      <span id="star-display-{{ product.id }}">
-        {% render 'stars', rating: avg_rating %} 
-      </span>
-      <span id="vote-count-{{ product.id }}">
-        ({{ avg_rating | round: 1 }} / 5)
-      </span>
-      
-    {% else %}
-      <span class="input-label">Rating: </span>
-      <span id="star-display-{{ product.id }}">
-        {% for i in (1..5) %}
-          <span class="star-vote" data-rating="{{ i }}">★</span>
-        {% endfor %}
-      </span>
-      <span id="vote-count-{{ product.id }}">
-      </span>
-    {% endif %}
+ {% comment %} calculate average for display/initial color setting {% endcomment %}
+{% assign rounded_avg_rating = avg_rating | round %}
+
+<span id="star-display-{{ product.id }}" class="interactive-stars">
+        <span id="vote-count-{{ product.id }}">
+      {% if is_rated %}
+        {{ avg_rating | round: 1 }} 
+      {% endif %}
+    </span>
+      {% for i in (1..5) %}
+        
+        {% comment %} star styling {% endcomment %}
+        {% assign star_color = '#ccc' %}
+        {% if is_rated and i <= rounded_avg_rating %}
+          {% assign star_color = '#F7BC45' %}
+        {% endif %}
+        
+        <span class="star-vote" 
+              data-rating="{{ i }}" 
+              style="color: {{ star_color }};" 
+        >★</span>
+      {% endfor %}
+    </span>
+    
+  
 
   </div>
 
@@ -51,6 +59,8 @@
     const productId = {{ product.id }};
     const widgetElement = document.getElementById(`star-rating-widget-${productId}`);
     const messageElement = document.getElementById(`rating-message-${productId}`);
+    const initialRatingElement = widgetElement.getAttribute('data-initial-rating');
+    const initialRating = initialRatingElement ? parseInt(initialRatingElement) : 0;
     
     // rating functionality
     const starDisplayElement = widgetElement.querySelector('#star-display-' + productId);
@@ -60,20 +70,24 @@
 
     // star hover effects 
     stars.forEach(star => {
+      // star hover mouseover
       star.addEventListener('mouseover', (e) => {
           const ratingValue = parseInt(e.target.dataset.rating);
           stars.forEach(s => {
               s.style.color = parseInt(s.dataset.rating) <= ratingValue ? '#F7BC45' : '#ccc'; 
           });
       });
+      
+      // reset stars to average rating on initial load/reload
       star.addEventListener('mouseout', () => {
-          stars.forEach(s => s.style.color = '#ccc'); 
+          stars.forEach(s => {
+              s.style.color = parseInt(s.dataset.rating) <= parseInt(widgetElement.getAttribute('data-initial-rating')) ? '#F7BC45' : '#ccc'; 
+          });
       });
 
       // click listener for rating submission
       star.addEventListener('click', async (e) => {
         const rating = e.target.dataset.rating;
-        messageElement.textContent = 'Submitting rating...';
         starDisplayElement.style.pointerEvents = 'none'; 
         
         try {
@@ -86,19 +100,18 @@
           if (response.ok) {
               const data = await response.json();
               const newAverage = parseFloat(data.newAvgRating); 
-              messageElement.textContent = 'Thanks for your rating!';
+              messageElement.textContent = 'Thanks for rating!';
               
               // update star display
               const roundedRating = Math.round(newAverage);
-              let newStarHTML = '';
               
-              // Re-render stars based on new average
-              for (let i = 1; i <= 5; i++) {
-                  newStarHTML += `<span class="star-fill" style="color: ${i <= roundedRating ? '#F7BC45' : '#ccc'}; cursor: default;">★</span>`;
-              }
-              starDisplayElement.innerHTML = newStarHTML;
+              stars.forEach(s => {
+                  s.style.color = parseInt(s.dataset.rating) <= roundedRating ? '#F7BC45' : '#ccc';
+              });
               
-              // update average text ---
+              widgetElement.setAttribute('data-initial-rating', roundedRating);
+              
+              // update average text 
               const voteCountElement = widgetElement.querySelector('#vote-count-' + productId);
               if (voteCountElement) {
                  voteCountElement.textContent = `(${newAverage.toFixed(1)} / 5)`;
