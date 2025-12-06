@@ -7,6 +7,13 @@
 
 {% assign is_rated = false %}
 
+{% comment %} 
+  persist average rating 
+{% endcomment %}
+{% if avg_rating > 0 %}
+  {% assign is_rated = true %}
+{% endif %}
+
 
 {% comment %} star rating widget {% endcomment %}
 <div id="star-rating-container-{{ product.id }}" class="star-rating-container">
