@@ -4,6 +4,9 @@
 {% comment %} Ensure avg_rating is a number {% endcomment %}
 {% assign avg_rating = avg_rating_raw | times: 1 %} 
 
+{% comment %} Get total review count {% endcomment %}
+{% assign total_ratings = product.metafields.reviews.total_ratings.value | times: 1 | default: 0 %}
+
 {% assign is_rated = false %}
 
 {% comment %} Check if custom.star_ratings metafield has content {% endcomment %}
@@ -26,25 +29,26 @@
 {% assign rounded_avg_rating = avg_rating | round %}
 
 <span id="star-display-{{ product.id }}" class="interactive-stars">
-        <span id="vote-count-{{ product.id }}">
-      {% if is_rated %}
-        {{ avg_rating | round: 1 }} 
-      {% endif %}
-    </span>
-      {% for i in (1..5) %}
+    {% for i in (1..5) %}
         
         {% comment %} star styling {% endcomment %}
-        {% assign star_color = '#ccc' %}
-        {% if is_rated and i <= rounded_avg_rating %}
-          {% assign star_color = '#F7BC45' %}
+      {% assign star_color = '#ccc' %}
+      {% if is_rated and i <= rounded_avg_rating %}
+        {% assign star_color = '#F7BC45' %}
+      {% endif %}
+
+      <span class="star-vote" 
+            data-rating="{{ i }}" 
+            style="color: {{ star_color }};" 
+      >★</span>
+    {% endfor %}
+
+    <span id="vote-count-{{ product.id }}" class="rating-count-text" style="margin-left: 5px;">
+        {% if is_rated %}
+            {{ avg_rating | round: 1 }} ({{ total_ratings }} reviews)
         {% endif %}
-        
-        <span class="star-vote" 
-              data-rating="{{ i }}" 
-              style="color: {{ star_color }};" 
-        >★</span>
-      {% endfor %}
     </span>
+</span>
     
   
 
@@ -100,6 +104,7 @@
           if (response.ok) {
               const data = await response.json();
               const newAverage = parseFloat(data.newAvgRating); 
+              const totalReviews = parseInt(data.totalRatings); 
               messageElement.textContent = 'Thanks for rating!';
               
               // update star display
@@ -114,7 +119,7 @@
               // update average text 
               const voteCountElement = widgetElement.querySelector('#vote-count-' + productId);
               if (voteCountElement) {
-                 voteCountElement.textContent = `(${newAverage.toFixed(1)} / 5)`;
+                 voteCountElement.textContent = `${newAverage.toFixed(1)} (${totalReviews} review${totalReviews !== 1 ? 's' : ''})`;
               }
 
           } else {
