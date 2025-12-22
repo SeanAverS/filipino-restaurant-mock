@@ -98,6 +98,15 @@
               },
               "blocks": {}
             },
+            "footer_policy_list_D3rHLq": {
+              "type": "footer-policy-list",
+              "name": "t:names.policy_list",
+              "settings": {
+                "font_size": "0.75rem",
+                "case": "none"
+              },
+              "blocks": {}
+            },
             "footer_copyright_wRCpeV": {
               "type": "footer-copyright",
               "settings": {
@@ -111,6 +120,7 @@
           "block_order": [
             "text_Uceijj",
             "social_links_AxXi9x",
+            "footer_policy_list_D3rHLq",
             "footer_copyright_wRCpeV"
           ]
         }
